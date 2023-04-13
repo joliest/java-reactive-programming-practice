@@ -8,12 +8,13 @@ import java.util.List;
 public class FluxAndMonoGeneratorService {
     public Flux<String> namesFlux() {
         // creating a Flux
-        return Flux.fromIterable(List.of("Alex", "Joli", "Popoy")); // imagine we retrieved this in a db
+        return Flux.fromIterable(List.of("Alex", "Joli", "Popoy")) // imagine we retrieved this in a db
+                .log();
     }
 
     public Mono<String> nameMono() {
         // creating a Mono
-        return Mono.just("Alex");
+        return Mono.just("Alex").log();
     }
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
