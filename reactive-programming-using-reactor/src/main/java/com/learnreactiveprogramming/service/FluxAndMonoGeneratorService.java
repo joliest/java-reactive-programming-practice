@@ -10,6 +10,12 @@ public class FluxAndMonoGeneratorService {
         // creating a Flux
         return Flux.fromIterable(List.of("Alex", "Joli", "Popoy", "Khaye")); // imagine we retrieved this in a db
     }
+    public Flux<String> namesFlux_map() {
+        // creating a Flux
+        return Flux.fromIterable(List.of("Alex", "Joli", "Popoy"))
+                .map(String::toUpperCase)
+                .log();
+    }
 
     public Mono<String> nameMono() {
         // creating a Mono
