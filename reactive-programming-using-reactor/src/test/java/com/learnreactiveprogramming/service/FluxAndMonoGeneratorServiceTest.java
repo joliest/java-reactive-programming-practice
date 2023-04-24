@@ -43,7 +43,7 @@ class FluxAndMonoGeneratorServiceTest {
         var namesFlux_map = fluxAndMonoGeneratorService.namesFlux_immutability();
 
         StepVerifier.create(namesFlux_map)
-                .expectNext("ALEX", "JOLI", "POPOY")
+                .expectNext("Alex", "Joli", "Popoy")
                 .verifyComplete();
     }
 }
