@@ -36,4 +36,14 @@ class FluxAndMonoGeneratorServiceTest {
                 .expectNext("ALEX", "JOLI", "POPOY")
                 .verifyComplete();
     }
+
+    // this will fail as flux is immutable, it should only be chained
+    @Test
+    void namesFlux_immutability() {
+        var namesFlux_map = fluxAndMonoGeneratorService.namesFlux_immutability();
+
+        StepVerifier.create(namesFlux_map)
+                .expectNext("ALEX", "JOLI", "POPOY")
+                .verifyComplete();
+    }
 }

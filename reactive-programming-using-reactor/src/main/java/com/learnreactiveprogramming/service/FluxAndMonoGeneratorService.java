@@ -16,6 +16,13 @@ public class FluxAndMonoGeneratorService {
                 .map(String::toUpperCase)
                 .log();
     }
+    public Flux<String> namesFlux_immutability() {
+        var nameFlux = Flux.fromIterable(List.of("Alex", "Joli", "Popoy"));
+        // this will cause error. It needs to be attached via method chaining
+        // map always returns a new FluxMap instance, so this below will not work.
+        nameFlux.map(String::toUpperCase);
+        return nameFlux;
+    }
 
     public Mono<String> nameMono() {
         // creating a Mono
