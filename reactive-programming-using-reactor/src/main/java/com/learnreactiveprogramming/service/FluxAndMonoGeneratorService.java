@@ -3,7 +3,9 @@ package com.learnreactiveprogramming.service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Random;
 
 public class FluxAndMonoGeneratorService {
     public Flux<String> namesFlux() {
@@ -41,9 +43,28 @@ public class FluxAndMonoGeneratorService {
     }
     // ALEX -> Flux(A,L,E,X)
     public Flux<String> splitString(String name) {
-        var charArray = name.split(""); // returns String[] 
+        var charArray = name.split(""); // returns String[]
         return Flux.fromArray(charArray);
     }
+    // demonstrating Asynchronous nature of flatMap()
+    public Flux<String> namesFlux_flatMapAsync(int stringLength) {
+        // creating a Flux
+        return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                .map(String::toUpperCase)
+                .filter(s -> s.length() > stringLength)
+                /**
+                 * make the call asynchronous, wait for the response of all the results
+                 */
+                .flatMap(this::splitString_withDelayForAsyncDemo) // async
+                .log();
+    }
+    public Flux<String> splitString_withDelayForAsyncDemo(String name) {
+        var charArray = name.split(""); // returns String[]
+        var delay = new Random().nextInt(1000); // random value between 0 - 1000
+        return Flux.fromArray(charArray)
+                .delayElements(Duration.ofMillis(delay)); // make this async
+    }
+
     public Mono<String> nameMono() {
         // creating a Mono
         return Mono.just("Alex");
