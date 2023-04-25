@@ -64,6 +64,14 @@ public class FluxAndMonoGeneratorService {
         return Flux.fromArray(charArray)
                 .delayElements(Duration.ofMillis(delay)); // make this async
     }
+    public Flux<String> namesFlux_concatMap(int stringLength) {
+        // creating a Flux
+        return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                .map(String::toUpperCase)
+                .filter(s -> s.length() > stringLength)
+                .concatMap(this::splitString_withDelayForAsyncDemo) // preserves the ordering sequence, unlike the flatMap()
+                .log();
+    }
 
     public Mono<String> nameMono() {
         // creating a Mono
