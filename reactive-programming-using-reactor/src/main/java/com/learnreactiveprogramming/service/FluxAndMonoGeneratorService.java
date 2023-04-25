@@ -31,6 +31,19 @@ public class FluxAndMonoGeneratorService {
                 .filter(s -> s.length() > stringLength)
                 .log();
     }
+    public Flux<String> namesFlux_flatMap(int stringLength) {
+        // creating a Flux
+        return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                .map(String::toUpperCase)
+                .filter(s -> s.length() > stringLength)
+                .flatMap(this::splitString) // "A", "L","E","X","C","H","L","O","E"
+                .log();
+    }
+    // ALEX -> Flux(A,L,E,X)
+    public Flux<String> splitString(String name) {
+        var charArray = name.split(""); // returns String[] 
+        return Flux.fromArray(charArray);
+    }
     public Mono<String> nameMono() {
         // creating a Mono
         return Mono.just("Alex");
