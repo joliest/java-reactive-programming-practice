@@ -96,6 +96,13 @@ public class FluxAndMonoGeneratorService {
         return Mono.just(charList)
                 .log();
     }
+    public Flux<String> nameMono_flatMapMany(int stringLength) {
+        return Mono.just("Alex")
+                .map(String::toUpperCase)
+                .filter(s -> s.length() > stringLength)
+                .flatMapMany(this::splitString_withDelayForAsyncDemo)
+                .log(); // Mono<List<String>> A,L,E,X
+    }
 
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
