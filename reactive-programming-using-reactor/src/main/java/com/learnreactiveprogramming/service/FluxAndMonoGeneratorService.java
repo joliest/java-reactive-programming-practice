@@ -77,6 +77,26 @@ public class FluxAndMonoGeneratorService {
         // creating a Mono
         return Mono.just("Alex");
     }
+
+    public Mono<String> nameMono_map_filter(int stringLength) {
+        return Mono.just("Alex")
+                .map(String::toUpperCase)
+                .filter(s -> s.length() > stringLength);
+    }
+    public Mono<List<String>> nameMono_flatMap(int stringLength) {
+        return Mono.just("Alex")
+                .map(String::toUpperCase)
+                .filter(s -> s.length() > stringLength)
+                .flatMap(this::splitStringMono); // Mono<List<String>> A,L,E,X
+    }
+
+    private Mono<List<String>> splitStringMono(String s) {
+        var charArray = s.split(""); // returns String[]
+        var charList = List.of(charArray); // ALEX -> A,L,E,X
+        return Mono.just(charList)
+                .log();
+    }
+
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
         // Only way to access the value, "subscribe" to the Flux
