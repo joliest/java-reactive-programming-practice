@@ -6,6 +6,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 public class FluxAndMonoGeneratorService {
     public Flux<String> namesFlux() {
@@ -103,6 +104,17 @@ public class FluxAndMonoGeneratorService {
                 .flatMapMany(this::splitString_withDelayForAsyncDemo)
                 .log(); // Mono<List<String>> A,L,E,X
     }
+
+    // transform() is used to extract piece of functionality and assign it to variable.
+    // (useful if you want a reusable function/logic)
+    public Flux<String> nameFlux_transform(int stringLength) {
+        Function<Flux<String>, Flux<String>> filterMap = name -> name.map(String::toUpperCase)
+                .filter(s -> s.length() > stringLength);
+        return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                .transform(filterMap)
+                .flatMap(this::splitString);
+    }
+
 
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
