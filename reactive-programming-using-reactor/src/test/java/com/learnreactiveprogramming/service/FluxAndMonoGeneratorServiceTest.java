@@ -117,4 +117,22 @@ class FluxAndMonoGeneratorServiceTest {
                 .expectNext("A", "L","E","X","C","H","L","O","E")
                 .verifyComplete();
     }
+
+    @Test
+    void nameFlux_assigningDefaultValues() {
+        var namesFluxFlatMap = fluxAndMonoGeneratorService.nameFlux_assigningDefaultValues(6);
+
+        StepVerifier.create(namesFluxFlatMap)
+                .expectNext("default")
+                .verifyComplete();
+    }
+
+    @Test
+    void nameFlux_switchIfEmpty() {
+        var namesFluxFlatMap = fluxAndMonoGeneratorService.nameFlux_switchIfEmpty(6);
+
+        StepVerifier.create(namesFluxFlatMap)
+                .expectNext("D", "E", "F", "A", "U", "L", "T")
+                .verifyComplete();
+    }
 }
