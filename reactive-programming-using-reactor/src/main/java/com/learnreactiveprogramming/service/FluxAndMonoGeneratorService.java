@@ -180,6 +180,16 @@ public class FluxAndMonoGeneratorService {
         return aMono.mergeWith(dMono).log();
     }
 
+    public Flux<String> explore_mergeSequential() {
+        // scenario when you have two data sources and you want them in order
+        var abcFlux = Flux.just("A", "B", "C")
+                .delayElements(Duration.ofMillis(100)); // A
+        var defFlux = Flux.just("D", "E", "F")
+                .delayElements(Duration.ofMillis(125));
+
+        return Flux.mergeSequential(abcFlux, defFlux).log();
+    }
+
 
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
