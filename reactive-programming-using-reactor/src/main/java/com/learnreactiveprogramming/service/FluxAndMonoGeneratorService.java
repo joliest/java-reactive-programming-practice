@@ -191,6 +191,46 @@ public class FluxAndMonoGeneratorService {
     }
 
 
+    public Flux<String> explore_zip() {
+        // scenario when you have two data sources and you want them in order
+        var abcFlux = Flux.just("A", "B", "C");
+        var defFlux = Flux.just("D", "E", "F");
+
+        return Flux.zip(abcFlux, defFlux, (first, second) -> first + second).log(); // AD, BE, CF
+    }
+
+    public Flux<String> explore_zip4() {
+        // scenario when you have two data sources and you want them in order
+        var abcFlux = Flux.just("A", "B", "C");
+        var defFlux = Flux.just("D", "E", "F");
+        var _123Flux = Flux.just("1", "2", "3");
+        var _456Flux = Flux.just("4", "5", "6");
+
+        // "AD14", "BE25", "CF36
+        return Flux.zip(abcFlux, defFlux, _123Flux, _456Flux)
+                .map(tupple -> tupple.getT1() + tupple.getT2() + tupple.getT3() + tupple.getT4())
+                .log(); // AD, BE, CF
+    }
+
+    public Flux<String> explore_zipWith() {
+        // scenario when you have two data sources and you want them in order
+        var abcFlux = Flux.just("A", "B", "C");
+        var defFlux = Flux.just("D", "E", "F");
+
+        return abcFlux.zipWith(defFlux, (first, second) -> first + second).log(); // AD, BE, CF
+    }
+
+    public Mono<String> explore_zipWith_mono() {
+        // scenario when you have two data sources and you want them in order
+        var abcMono = Mono.just("A");
+        var defMono = Mono.just("D");
+
+        return abcMono.zipWith(defMono)
+                .map(t2 -> t2.getT1() + t2.getT2())
+                .log(); // AD, BE, CF
+    }
+
+
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
         // Only way to access the value, "subscribe" to the Flux
