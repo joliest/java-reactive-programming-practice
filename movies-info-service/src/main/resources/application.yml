@@ -1,0 +1,29 @@
+#yml provide the properties for the application
+#has handy way of configuring multiple files in the app
+#more powerful than applciation.properties
+
+spring:
+  profiles:
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - local
+  data:
+    mongodb: # by default, it will still work without this, sprint boot will try to create a connection
+      host: localhost
+      port: 27017
+      database: local
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - non-prod
+  data:
+    mongodb: # by default, it will still work without this, sprint boot will try to create a connection
+      host: localhost
+      port: 27017
+      database: local

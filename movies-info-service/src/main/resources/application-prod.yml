@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  data:
+    mongodb: # by default, it will still work without this, sprint boot will try to create a connection
+      host: localhost
+      port: 27017
+      database: local
