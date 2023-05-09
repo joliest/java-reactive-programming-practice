@@ -75,4 +75,20 @@ class MovieInfoRepositoryTest {
                 })
                 .verifyComplete();
     }
+
+    @Test
+    void updateMovieInfo() {
+        // block will give you the access of the actual type, not the Mono / Flux.
+        // We have the access of movie type
+        var moviesInfo = movieInfoRepository.findById("abc").block();
+        moviesInfo.setYear(2021);
+        var moviesInfoMono = movieInfoRepository
+                .save(moviesInfo)
+                .log();
+        StepVerifier.create(moviesInfoMono)
+                .assertNext(movieInfo1 -> {
+                    assertEquals(2021, movieInfo1.getYear());
+                })
+                .verifyComplete();
+    }
 }
