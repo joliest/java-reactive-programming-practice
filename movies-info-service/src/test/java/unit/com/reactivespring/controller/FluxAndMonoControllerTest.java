@@ -61,4 +61,37 @@ class FluxAndMonoControllerTest {
                     assert Objects.requireNonNull(responseBody).size() == 3;
                 });
     }
+
+    @Test
+    void mono() {
+        var flux = webTestClient
+                .get()
+                .uri("/mono")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(String.class)
+                .consumeWith(stringEntityExchangeResult -> {
+                    var responseBody = stringEntityExchangeResult.getResponseBody();
+                    assertEquals("Hello", responseBody);
+                });
+    }
+
+    // test will continously running and never ends, we should handle it
+
+    @Test
+    void stream() {
+        var flux = webTestClient
+                .get()
+                .uri("/stream")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .returnResult(Long.class)
+                .getResponseBody();
+        StepVerifier.create(flux)
+                .expectNext(0L, 1L, 2L, 3L)
+                .thenCancel() // prevents it from continously sending values
+                .verify();
+    }
 }
