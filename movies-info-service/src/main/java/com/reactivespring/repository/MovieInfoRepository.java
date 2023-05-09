@@ -5,4 +5,5 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 // ReactiveMongoRepository - this will enable the reactive nature of mongo db
 public interface MovieInfoRepository extends ReactiveMongoRepository<MovieInfo, String> {
+
 }
