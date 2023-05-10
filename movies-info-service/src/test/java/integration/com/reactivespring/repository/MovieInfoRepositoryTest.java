@@ -91,4 +91,13 @@ class MovieInfoRepositoryTest {
                 })
                 .verifyComplete();
     }
+    @Test
+    void deleteMovieInfo() {
+        // add block, delete id will return immediately before findALl is excuted. Block will prevent that
+        movieInfoRepository.deleteById("abc").block();
+        var moviesInfoFlux = movieInfoRepository.findAll().log();
+        StepVerifier.create(moviesInfoFlux)
+                .expectNextCount(2)
+                .verifyComplete();
+    }
 }
