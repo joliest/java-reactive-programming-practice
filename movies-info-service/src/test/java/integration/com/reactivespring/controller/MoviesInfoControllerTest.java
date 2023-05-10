@@ -67,4 +67,17 @@ class MoviesInfoControllerTest {
                 });
 
     }
+
+    @Test
+    void addAllMovieInfos() {
+        webTestClient
+                .get()
+                .uri(MOVIES_INFO_URL)
+                .exchange() // make the call to the endpoint
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(3);
+
+    }
 }
