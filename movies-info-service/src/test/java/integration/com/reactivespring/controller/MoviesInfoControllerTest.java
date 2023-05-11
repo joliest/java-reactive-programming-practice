@@ -69,7 +69,7 @@ class MoviesInfoControllerTest {
     }
 
     @Test
-    void addAllMovieInfos() {
+    void getAllMovieInfos() {
         webTestClient
                 .get()
                 .uri(MOVIES_INFO_URL)
@@ -78,6 +78,39 @@ class MoviesInfoControllerTest {
                 .is2xxSuccessful()
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
+
+    }
+
+    @Test
+    void findMovieInfoById_approach_1() {
+        var movieInfoId = "abc";
+        webTestClient
+                .get()
+                .uri(MOVIES_INFO_URL + "/{id}", movieInfoId)
+                .exchange() // make the call to the endpoint
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    // get access of the actual body
+                    var responseBody = movieInfoEntityExchangeResult.getResponseBody();
+                    assertNotNull(responseBody);
+                });
+
+    }
+
+    @Test
+    void findMovieInfoById_approach_2() {
+        var movieInfoId = "abc";
+        webTestClient
+                .get()
+                .uri(MOVIES_INFO_URL + "/{id}", movieInfoId)
+                .exchange() // make the call to the endpoint
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                // another way, accessing the name on the , starts with "$" dollar sign
+                .jsonPath("$.name").isEqualTo("Dark Knight Rises");
 
     }
 }

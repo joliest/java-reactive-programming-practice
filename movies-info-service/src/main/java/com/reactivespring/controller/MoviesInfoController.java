@@ -28,4 +28,9 @@ public class MoviesInfoController {
     public Flux<MovieInfo> getAllMovieInfos() {
         return movieInfoService.getAllMovieInfos().log();
     }
+
+    @GetMapping("/movieinfos/{id}")
+    public Mono<MovieInfo> getMovieInfoById(@PathVariable String id) {
+        return movieInfoService.getMovieInfoById(id).log();
+    }
 }
