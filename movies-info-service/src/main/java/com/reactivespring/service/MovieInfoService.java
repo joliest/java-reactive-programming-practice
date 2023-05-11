@@ -25,4 +25,20 @@ public class MovieInfoService {
     public Mono<MovieInfo> getMovieInfoById(String id) {
         return movieInfoRepository.findById(id);
     }
+
+    public Mono<MovieInfo> updateMovieInfo(MovieInfo updateMovieInfo, String id) {
+        return movieInfoRepository.findById(id)
+                .flatMap(movieInfo -> {
+                    movieInfo.setCast(updateMovieInfo.getCast());
+                    movieInfo.setName(updateMovieInfo.getName());
+                    movieInfo.setRelease_date(updateMovieInfo.getRelease_date());
+                    movieInfo.setYear(updateMovieInfo.getYear());
+
+                    // reason why we use flat map is that, we ae doing this operation,
+                    // this operation will return a Mono which is a Reactive Type
+                    // if you want to have a returning value of reactive type, use "flatMap()" method
+                    return movieInfoRepository.save(movieInfo);
+                });
+
+    }
 }

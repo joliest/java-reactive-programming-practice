@@ -113,4 +113,26 @@ class MoviesInfoControllerTest {
                 .jsonPath("$.name").isEqualTo("Dark Knight Rises");
 
     }
+
+    @Test
+    void updateMovieInfo() {
+        var movieInfoId = "abc";
+        var movieInfo = new MovieInfo(null, "Dark Knight Rises (Updated)",
+                2012, List.of("Christian Bale", "Tom Hardy"), LocalDate.parse("2012-07-20"));
+        webTestClient
+                .put()
+                .uri(MOVIES_INFO_URL + "/{id}", movieInfoId)
+                .bodyValue(movieInfo)
+                .exchange() // make the call to the endpoint
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var updateMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assert updateMovieInfo != null;
+                    assert  updateMovieInfo.getMovieInfoId() != null;
+                    assertEquals("Dark Knight Rises (Updated)", updateMovieInfo.getName());
+                });
+
+    }
 }
