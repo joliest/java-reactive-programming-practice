@@ -135,4 +135,15 @@ class MoviesInfoControllerTest {
                 });
 
     }
+
+    @Test
+    void deleteMovieInfo() {
+        var movieInfoId = "abc";
+        webTestClient
+                .delete()
+                .uri(MOVIES_INFO_URL + "/{id}", movieInfoId)
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+    }
 }
