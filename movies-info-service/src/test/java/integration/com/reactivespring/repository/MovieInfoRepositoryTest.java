@@ -108,4 +108,12 @@ class MovieInfoRepositoryTest {
                 .expectNextCount(1)
                 .verifyComplete();
     }
+
+    @Test
+    void findByName() {
+        var moviesInfoFlux = movieInfoRepository.findByName("Batman Begins").log();
+        StepVerifier.create(moviesInfoFlux)
+                .expectNextCount(1)
+                .verifyComplete();
+    }
 }
