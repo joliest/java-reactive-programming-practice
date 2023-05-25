@@ -100,4 +100,12 @@ class MovieInfoRepositoryTest {
                 .expectNextCount(2)
                 .verifyComplete();
     }
+
+    @Test
+    void findByYear() {
+        var moviesInfoFlux = movieInfoRepository.findByYear(2005).log();
+        StepVerifier.create(moviesInfoFlux)
+                .expectNextCount(1)
+                .verifyComplete();
+    }
 }
