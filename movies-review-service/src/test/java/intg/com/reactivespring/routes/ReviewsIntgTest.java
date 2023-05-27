@@ -13,6 +13,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
+import static org.springframework.test.util.AssertionErrors.assertEquals;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // avoid conflicting to :8080 port
 @ActiveProfiles("test") // this is important, avoid embedded mongo statup issues. should be different with your environments
 @AutoConfigureWebTestClient //we need the webtest client to interact with the endpoint
@@ -29,7 +31,7 @@ public class ReviewsIntgTest {
     @BeforeEach
     void setup() {
         var reviewsList = List.of(
-                new Review(null, 1L, "Awesome Movie", 9.0),
+                new Review("abc", 1L, "Awesome Movie", 9.0),
                 new Review(null, 1L, "Awesome Movie1", 9.0),
                 new Review(null, 2L, "Excellent Movie", 8.0));
         reviewReactiveRepository.saveAll(reviewsList)
@@ -77,5 +79,24 @@ public class ReviewsIntgTest {
                 .is2xxSuccessful()
                 .expectBodyList(Review.class)
                 .hasSize(3);
+    }
+
+    @Test
+    void updateReviewById() {
+        var id = "abc";
+        webTestClient
+                .put()
+                .uri(REVIEWS_URL + "/{id}", id)
+                .bodyValue(Review.builder()
+                        .comment("New Comment")
+                        .rating(2D)
+                        .build())
+                .exchange()
+                .expectBody(Review.class)
+                .consumeWith(reviewEntityExchangeResult -> {
+                    var responseBody = reviewEntityExchangeResult.getResponseBody();
+                    assert "New Comment".equals(responseBody.getComment());
+                    assert 2D == responseBody.getRating();
+                });
     }
 }

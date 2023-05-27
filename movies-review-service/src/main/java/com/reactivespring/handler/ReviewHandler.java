@@ -40,4 +40,21 @@ public class ReviewHandler {
         // other way in sending body response
         return ServerResponse.ok().body(reviewsFlux, Review.class);
     }
+
+    public Mono<ServerResponse> updateReview(ServerRequest serverRequest) {
+        var reviewId = serverRequest.pathVariable("id");
+        var reviewFromDb = reviewReactiveRepository.findById(reviewId);
+        return reviewFromDb
+                .flatMap(existingReview ->
+                        // accessing the request body
+                        serverRequest.bodyToMono(Review.class)
+                                .map(requestReview -> {
+                                    existingReview.setComment(requestReview.getComment());
+                                    existingReview.setRating(requestReview.getRating());
+                                    return requestReview;
+                                })
+                                .flatMap(reviewReactiveRepository::save)
+                                .flatMap(savedReview -> ServerResponse.ok().bodyValue(savedReview))
+                );
+    }
 }

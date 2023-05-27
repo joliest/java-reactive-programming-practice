@@ -24,7 +24,8 @@ public class ReviewRouter {
                              * 'request' needs to be passed to the handler
                              */
                             .POST("", reviewHandler::addReview)
-                            .GET("", reviewHandler::getReviews);
+                            .GET("", reviewHandler::getReviews)
+                            .PUT("/{id}", reviewHandler::updateReview);
 
                 })
                 .GET("/v1/helloworld", request -> ServerResponse.ok().bodyValue("hello world"))
