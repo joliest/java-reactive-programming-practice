@@ -25,7 +25,8 @@ public class ReviewRouter {
                              */
                             .POST("", reviewHandler::addReview)
                             .GET("", reviewHandler::getReviews)
-                            .PUT("/{id}", reviewHandler::updateReview);
+                            .PUT("/{id}", reviewHandler::updateReview)
+                            .DELETE("/{id}", reviewHandler::deleteReview);
 
                 })
                 .GET("/v1/helloworld", request -> ServerResponse.ok().bodyValue("hello world"))

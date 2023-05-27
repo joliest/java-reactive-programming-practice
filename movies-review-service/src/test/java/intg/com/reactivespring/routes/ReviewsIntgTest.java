@@ -99,4 +99,15 @@ public class ReviewsIntgTest {
                     assert 2D == responseBody.getRating();
                 });
     }
+
+    @Test
+    void deleteReviewById() {
+        var id = "abc";
+        webTestClient
+                .delete()
+                .uri(REVIEWS_URL + "/{id}", id)
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+    }
 }
