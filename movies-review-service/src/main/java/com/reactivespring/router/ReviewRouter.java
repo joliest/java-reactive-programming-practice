@@ -22,6 +22,7 @@ public class ReviewRouter {
                  * 'request' needs to be passed to the handler
                  */
                 .POST("/v1/reviews", request -> reviewHandler.addReview(request))
+                .GET("/v1/reviews", request -> reviewHandler.getReviews(request))
                 .build();
     }
 }

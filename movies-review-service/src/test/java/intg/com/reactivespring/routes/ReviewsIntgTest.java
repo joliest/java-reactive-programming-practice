@@ -24,7 +24,7 @@ public class ReviewsIntgTest {
     @Autowired
     ReviewReactiveRepository reviewReactiveRepository;
 
-    static String REVIEWS_URL = "v1/reviews";
+    static String REVIEWS_URL = "/v1/reviews";
 
     @BeforeEach
     void setup() {
@@ -63,5 +63,19 @@ public class ReviewsIntgTest {
                     assert savedReview != null;
                     assert  savedReview.getReviewId() != null;
                 });
+    }
+    @Test
+    void getReviews() {
+        // Given
+
+        // When
+        webTestClient
+                .get()
+                .uri(REVIEWS_URL)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(Review.class)
+                .hasSize(3);
     }
 }

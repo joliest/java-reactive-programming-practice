@@ -33,4 +33,11 @@ public class ReviewHandler {
                         .status(HttpStatus.CREATED)
                         .bodyValue(saveReview));
     }
+
+    public Mono<ServerResponse> getReviews(ServerRequest request) {
+        var reviewsFlux = reviewReactiveRepository.findAll();
+
+        // other way in sending body response
+        return ServerResponse.ok().body(reviewsFlux, Review.class);
+    }
 }
