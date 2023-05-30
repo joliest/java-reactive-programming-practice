@@ -85,8 +85,8 @@ public class ReviewHandler {
 
     public Mono<ServerResponse> updateReview(ServerRequest serverRequest) {
         var reviewId = serverRequest.pathVariable("id");
-        var reviewFromDb = reviewReactiveRepository.findById(reviewId)
-                .switchIfEmpty(Mono.error((new ReviewNotFoundException("Review not found for the given Review id" + reviewId))));
+        var reviewFromDb = reviewReactiveRepository.findById(reviewId);
+//                .switchIfEmpty(Mono.error((new ReviewNotFoundException("Review not found for the given Review id" + reviewId))));
         return reviewFromDb
                 .flatMap(existingReview ->
                         // accessing the request body
@@ -98,7 +98,10 @@ public class ReviewHandler {
                                 })
                                 .flatMap(reviewReactiveRepository::save)
                                 .flatMap(savedReview -> ServerResponse.ok().bodyValue(savedReview))
-                );
+                )
+                /** ANother 404 not found approach */
+                .switchIfEmpty(ServerResponse.notFound().build());
+
     }
 
     public Mono<ServerResponse> deleteReview(ServerRequest serverRequest) {
