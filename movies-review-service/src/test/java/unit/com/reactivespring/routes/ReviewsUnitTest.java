@@ -167,6 +167,24 @@ public class ReviewsUnitTest {
     }
 
     @Test
+    void updateReviewById_validation() {
+        when(reviewReactiveRepository.findById(isA(String.class)))
+                .thenReturn(Mono.empty());
+
+        var id = "abc";
+        webTestClient
+                .put()
+                .uri(REVIEWS_URL + "/{id}", id)
+                .bodyValue(Review.builder()
+                        .comment("New Comment")
+                        .rating(2D)
+                        .build())
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
     void deleteReviewById() {
         var review = new Review(null, 1L, "Awesome Movie", 9.0);
         when(reviewReactiveRepository.findById(isA(String.class)))
