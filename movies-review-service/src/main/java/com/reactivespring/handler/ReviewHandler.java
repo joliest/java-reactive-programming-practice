@@ -1,7 +1,10 @@
 package com.reactivespring.handler;
 
 import com.reactivespring.domain.Review;
+import com.reactivespring.exception.ReviewDataException;
 import com.reactivespring.repository.ReviewReactiveRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -9,12 +12,19 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.util.stream.Collectors;
+
 /**
  * Need @Component to be injected into RouterFunction<ServerResponse> reviewsRoute(...)
  */
 @Component
+@Slf4j
 public class ReviewHandler {
 
+    @Autowired
+    private Validator validator;
     private ReviewReactiveRepository reviewReactiveRepository;
 
     public ReviewHandler(ReviewReactiveRepository reviewReactiveRepository) {
@@ -23,6 +33,10 @@ public class ReviewHandler {
 
     public Mono<ServerResponse> addReview(ServerRequest request) {
         return request.bodyToMono(Review.class)
+                /**
+                 * allows you to have access with Review class
+                 */
+                .doOnNext(this::validate)
                 /**
                  * We will perform save operation and return the value
                  * Everytime you're going to perform a reactive operation
@@ -33,6 +47,23 @@ public class ReviewHandler {
                 .flatMap(saveReview -> ServerResponse
                         .status(HttpStatus.CREATED)
                         .bodyValue(saveReview));
+    }
+
+    private void validate(Review review) {
+        /**
+         * Gives you set of constraints for review
+         */
+        var constraintValidations = validator.validate(review);
+        log.info("constraintViolations: {}", constraintValidations);
+        if (constraintValidations.size() > 0) {
+            var errorMessage = constraintValidations
+                    .stream()
+                    .map(ConstraintViolation::getMessage)
+                    .sorted()
+                    .collect(Collectors.joining(","));
+            throw new ReviewDataException(errorMessage);
+        }
+
     }
 
     public Mono<ServerResponse> getReviews(ServerRequest request) {
