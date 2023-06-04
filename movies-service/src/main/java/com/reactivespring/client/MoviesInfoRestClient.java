@@ -19,7 +19,7 @@ public class MoviesInfoRestClient {
     }
 
     public Mono<MovieInfo> retrieveMovieInfo(String movieId) {
-        var url = movieInfoUrl.concat("/{id}");
+        var url = movieInfoUrl.concat("/" + movieId);
         return webClient
                 .get()
                 .uri(url)

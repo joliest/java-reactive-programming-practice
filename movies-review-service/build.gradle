@@ -21,6 +21,8 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	// resolves 'Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.93.Final'
 
 	//validator
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
