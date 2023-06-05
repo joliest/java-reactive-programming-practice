@@ -29,6 +29,7 @@ dependencies {
 	// wiremock
 	// automatically configures workspace in the workspace
 	testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner:3.0.3'
+	runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.76.Final:osx-aarch_64")
 }
 
 test {
