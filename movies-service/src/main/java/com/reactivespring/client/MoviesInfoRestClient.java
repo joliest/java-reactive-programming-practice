@@ -3,6 +3,7 @@ package com.reactivespring.client;
 import com.reactivespring.domain.MovieInfo;
 import com.reactivespring.exception.MoviesInfoClientException;
 import com.reactivespring.exception.MoviesInfoServerException;
+import com.reactivespring.util.RetryUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -29,13 +30,6 @@ public class MoviesInfoRestClient {
 
     public Mono<MovieInfo> retrieveMovieInfo(String movieId) {
         var url = movieInfoUrl.concat("/" + movieId);
-        // gives delay of 1 second and atempts 3 retries
-        var retrySpec = Retry.fixedDelay(3, Duration.ofSeconds(1))
-                // retry only for 5xx, leaves the 4xx alone
-                .filter(ex -> ex instanceof MoviesInfoServerException)
-                // anytime exception happens, we need to propagate the root cause of the issue so that client knows the actual error
-                // Without this, you will get vague errors
-                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> Exceptions.propagate(retrySignal.failure()));
         return webClient
                 .get()
                 .uri(url)
@@ -65,7 +59,7 @@ public class MoviesInfoRestClient {
                 .bodyToMono(MovieInfo.class)
                 // retry the call for 3x if the call fails
 //                .retry(3)
-                .retryWhen(retrySpec)
+                .retryWhen(RetryUtil.retrySpec())
                 .log();
     }
 }
