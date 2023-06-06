@@ -113,4 +113,27 @@ public class MoviesControllerIntgTest {
                 });
 
     }
+    @Test
+    void retrieveMovieById_500_MovieInfo() {
+        // given
+        var movieId = "abc";
+        stubFor(WireMock.get(urlEqualTo("/v1/movieinfos/" + movieId))
+                .willReturn(aResponse()
+                        .withStatus(500)
+                        .withBody("MovieInfo Service Unavailable")));
+
+//        stubFor(WireMock.get(urlPathEqualTo("/v1/reviews"))
+//                .willReturn(aResponse()
+//                        .withStatus(404)));
+
+        // wehn
+        webTestClient.get()
+                .uri("/v1/movies/{id}", movieId)
+                .exchange()
+                .expectStatus()
+                .is5xxServerError()
+                .expectBody(String.class)
+                .isEqualTo("Server error in MovieInfoService MovieInfo Service Unavailable");
+
+    }
 }
