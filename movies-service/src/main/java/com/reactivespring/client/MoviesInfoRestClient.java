@@ -8,7 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+
+import java.time.Duration;
 
 @Component
 @Slf4j
@@ -25,6 +29,13 @@ public class MoviesInfoRestClient {
 
     public Mono<MovieInfo> retrieveMovieInfo(String movieId) {
         var url = movieInfoUrl.concat("/" + movieId);
+        // gives delay of 1 second and atempts 3 retries
+        var retrySpec = Retry.fixedDelay(3, Duration.ofSeconds(1))
+                // retry only for 5xx, leaves the 4xx alone
+                .filter(ex -> ex instanceof MoviesInfoServerException)
+                // anytime exception happens, we need to propagate the root cause of the issue so that client knows the actual error
+                // Without this, you will get vague errors
+                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> Exceptions.propagate(retrySignal.failure()));
         return webClient
                 .get()
                 .uri(url)
@@ -53,7 +64,8 @@ public class MoviesInfoRestClient {
                 })
                 .bodyToMono(MovieInfo.class)
                 // retry the call for 3x if the call fails
-                .retry(3)
+//                .retry(3)
+                .retryWhen(retrySpec)
                 .log();
     }
 }

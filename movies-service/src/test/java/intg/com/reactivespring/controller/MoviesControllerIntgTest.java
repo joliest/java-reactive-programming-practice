@@ -61,8 +61,6 @@ public class MoviesControllerIntgTest {
                                 assert Objects.requireNonNull(movie).getReviewList().size() == 2;
                                 assertEquals("Batman Begins", movie.getMovieInfo().getName());
                         });
-
-
         }
     @Test
     void retrieveMovieById_404_MovieInfos() {
@@ -86,6 +84,9 @@ public class MoviesControllerIntgTest {
                 .is4xxClientError()
                 .expectBody(String.class)
                 .isEqualTo("There is no MovieInfo available for the given Id: abc");
+
+        // Should execute 1
+        WireMock.verify(1, getRequestedFor(urlEqualTo("/v1/movieinfos/" + movieId)));
     }
     @Test
     void retrieveMovieById_404_Reviews() {
@@ -111,7 +112,6 @@ public class MoviesControllerIntgTest {
                     assert Objects.requireNonNull(movie).getReviewList().size() == 0;
                     assertEquals("Batman Begins", movie.getMovieInfo().getName());
                 });
-
     }
     @Test
     void retrieveMovieById_500_MovieInfo() {
