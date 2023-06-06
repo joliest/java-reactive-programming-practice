@@ -135,5 +135,8 @@ public class MoviesControllerIntgTest {
                 .expectBody(String.class)
                 .isEqualTo("Server error in MovieInfoService MovieInfo Service Unavailable");
 
+        // verify the number of times the given URL is called. (1 original call + 3 retry calls)
+        WireMock.verify(4, getRequestedFor(urlEqualTo("/v1/movieinfos/" + movieId)));
+
     }
 }

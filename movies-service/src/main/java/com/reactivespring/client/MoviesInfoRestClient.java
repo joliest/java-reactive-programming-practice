@@ -52,6 +52,8 @@ public class MoviesInfoRestClient {
                             )));
                 })
                 .bodyToMono(MovieInfo.class)
+                // retry the call for 3x if the call fails
+                .retry(3)
                 .log();
     }
 }
