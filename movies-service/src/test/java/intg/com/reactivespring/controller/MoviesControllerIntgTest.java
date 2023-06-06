@@ -64,4 +64,53 @@ public class MoviesControllerIntgTest {
 
 
         }
+    @Test
+    void retrieveMovieById_404_MovieInfos() {
+        // given
+        var movieId = "abc";
+        stubFor(WireMock.get(urlEqualTo("/v1/movieinfos/" + movieId))
+                .willReturn(aResponse()
+                        .withStatus(404)));
+
+        stubFor(WireMock.get(urlPathEqualTo("/v1/reviews"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        // looks for this file at resources/__files/reviews.json
+                        .withBodyFile("reviews.json")));
+
+        // wehn
+        webTestClient.get()
+                .uri("/v1/movies/{id}", movieId)
+                .exchange()
+                .expectStatus()
+                .is4xxClientError()
+                .expectBody(String.class)
+                .isEqualTo("There is no MovieInfo available for the given Id: abc");
+    }
+    @Test
+    void retrieveMovieById_404_Reviews() {
+        // given
+        var movieId = "abc";
+        stubFor(WireMock.get(urlEqualTo("/v1/movieinfos/" + movieId))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("movieinfo.json")));
+
+        stubFor(WireMock.get(urlPathEqualTo("/v1/reviews"))
+                .willReturn(aResponse()
+                        .withStatus(404)));
+
+        // wehn
+        webTestClient.get()
+                .uri("/v1/movies/{id}", movieId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Movie.class)
+                .consumeWith(movieEntityExchangeResult -> {
+                    var movie = movieEntityExchangeResult.getResponseBody();
+                    assert Objects.requireNonNull(movie).getReviewList().size() == 0;
+                    assertEquals("Batman Begins", movie.getMovieInfo().getName());
+                });
+
+    }
 }
