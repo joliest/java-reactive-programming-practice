@@ -4,6 +4,7 @@ import com.reactivespring.domain.MovieInfo;
 import com.reactivespring.service.MovieInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -19,6 +20,8 @@ public class MoviesInfoController {
 
     private MovieInfoService movieInfoService;
 
+    Sinks.Many<MovieInfo> movieInfoSink = Sinks.many().replay().all();
+
     // you can use autowiring, Dilip recommends this
     public MoviesInfoController(MovieInfoService movieInfoService) {
         this.movieInfoService = movieInfoService;
@@ -27,7 +30,20 @@ public class MoviesInfoController {
     @PostMapping("/movieinfos")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<MovieInfo> addMovieInfo(@Valid @RequestBody MovieInfo movieInfo) {
-        return movieInfoService.addMovieInfo(movieInfo).log();
+        return movieInfoService.addMovieInfo(movieInfo)
+                // anytime we add movie, we publish an event
+                .doOnNext(savedInfo -> {
+                    // publishing an event
+                    movieInfoSink.tryEmitNext(savedInfo);
+                });
+    }
+
+    // subscriber endpoint
+    // make sure to change produces
+    @GetMapping(value = "/movieinfos/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<MovieInfo> getMovieInfoById() {
+        // asFlux - attaching the subscriber
+        return movieInfoSink.asFlux();
     }
 
     @GetMapping("/movieinfos")
