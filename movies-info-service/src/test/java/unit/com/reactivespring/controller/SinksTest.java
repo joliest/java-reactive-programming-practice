@@ -41,7 +41,7 @@ public class SinksTest {
     }
 
     @Test
-    // transmits only the newly published data
+        // transmits only the newly published data
     void sinks_multicast() {
         // you need to add onBackpressureBuffer - newly pushed as in "after the subscriber's subscription"
         Sinks.Many<Integer> multicast = Sinks.many().multicast().onBackpressureBuffer();
@@ -58,7 +58,31 @@ public class SinksTest {
 
         // another subscriber
         Flux<Integer> integerFlux2 = multicast.asFlux();
-            integerFlux2.subscribe((i) -> {
+        integerFlux2.subscribe((i) -> {
+            System.out.println("Subscriber 2 : " + i);
+        });
+        multicast.emitNext(3, Sinks.EmitFailureHandler.FAIL_FAST);
+    }
+
+    @Test
+        // transmits only the newly published data
+    void sinks_unicast() {
+        // you need to add onBackpressureBuffer - newly pushed as in "after the subscriber's subscription"
+        Sinks.Many<Integer> multicast = Sinks.many().unicast().onBackpressureBuffer();
+
+        // subscriber 1
+        Flux<Integer> integerFlux = multicast.asFlux();
+        integerFlux.subscribe((i) -> {
+            System.out.println("Subscriber 1 : " + i);
+        });
+
+        // emitting events
+        multicast.emitNext(1, Sinks.EmitFailureHandler.FAIL_FAST);
+        multicast.emitNext(2, Sinks.EmitFailureHandler.FAIL_FAST);
+
+        // another subscriber
+        Flux<Integer> integerFlux2 = multicast.asFlux();
+        integerFlux2.subscribe((i) -> {
             System.out.println("Subscriber 2 : " + i);
         });
         multicast.emitNext(3, Sinks.EmitFailureHandler.FAIL_FAST);
