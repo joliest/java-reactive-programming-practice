@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -80,6 +81,42 @@ class MoviesInfoControllerTest {
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
 
+    }
+
+    @Test
+    void getAllMovieInfos_stream() {
+        var movieInfo = new MovieInfo(null, "Batman Begins 1",
+                2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+        webTestClient
+                .post()
+                .uri(MOVIES_INFO_URL)
+                .bodyValue(movieInfo)
+                .exchange() // make the call to the endpoint
+                .expectStatus()
+                .isCreated()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var savedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assert savedMovieInfo != null;
+                    assert  savedMovieInfo.getMovieInfoId() != null;
+                });
+
+        var movieStreamFlux = webTestClient
+                .get()
+                .uri(MOVIES_INFO_URL + "/stream")
+                .exchange() // make the call to the endpoint
+                .expectStatus()
+                .is2xxSuccessful()
+                .returnResult(MovieInfo.class)
+                .getResponseBody();
+
+        StepVerifier.create(movieStreamFlux)
+                .assertNext(movieInfo1 -> {
+                    assert movieInfo1.getMovieInfoId() != null;
+                })
+                // need to cancel to stop the connection
+                .thenCancel()
+                .verify();
     }
 
     @Test
